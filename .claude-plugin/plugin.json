@@ -1,0 +1,6 @@
+{
+  "name": "code-walkthrough",
+  "version": "1.0.0",
+  "description": "Walk through a codebase block by block in a local page, with plain explanations and a comment box Claude answers.",
+  "author": {"name": "Prerak Garg"}
+}

@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Code Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #F6F4F4; --surface: #FFFFFF; --sunk: #FAF8F8; --line: #E6E0E1; --line-2: #D9D1D3;
+  --ink: #1D1416; --ink-2: #57494C; --ink-3: #8A7C7F; --accent: #B3123A; --accent-soft: #F8E6EB;
+  --keep: #6F6668; --keep-bg: #F0EDEE; --simp: #A35F00; --simp-bg: #FCEFD9;
+  --rem: #5E5A5C; --rem-bg: #E4E1E2; --fix: #0B5CAD; --fix-bg: #DDEAF8;
+  --code-hl: #FFF6D6; --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #151112; --surface: #1D1819; --sunk: #191415; --line: #2E2628; --line-2: #3B3134;
+    --ink: #EFE8E9; --ink-2: #BDB0B3; --ink-3: #8C7F82; --accent: #F0577C; --accent-soft: #3A1C24;
+    --keep: #A99FA2; --keep-bg: #262122; --simp: #F0B048; --simp-bg: #33260F;
+    --rem: #C9C3C5; --rem-bg: #332E30; --fix: #6DB3EA; --fix-bg: #14243A; --code-hl: #2C2716;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #151112; --surface: #1D1819; --sunk: #191415; --line: #2E2628; --line-2: #3B3134;
+  --ink: #EFE8E9; --ink-2: #BDB0B3; --ink-3: #8C7F82; --accent: #F0577C; --accent-soft: #3A1C24;
+  --keep: #A99FA2; --keep-bg: #262122; --simp: #F0B048; --simp-bg: #33260F;
+  --rem: #C9C3C5; --rem-bg: #332E30; --fix: #6DB3EA; --fix-bg: #14243A; --code-hl: #2C2716;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.55 var(--sans); }
+.app { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+nav { border-right: 1px solid var(--line); background: var(--surface); padding: 20px 14px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+nav h1 { font-size: 15px; font-weight: 600; margin: 0 6px 4px; }
+nav .sub { font-size: 12px; color: var(--ink-3); margin: 0 6px 18px; }
+.repo { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); margin: 16px 6px 6px; }
+.file { display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: none; color: var(--ink-2); font: 500 13px var(--mono); padding: 6px 8px; border-radius: 6px; cursor: pointer; text-align: left; }
+.file:hover { background: var(--sunk); color: var(--ink); }
+.file.on { background: var(--accent-soft); color: var(--accent); }
+.file .n { margin-left: auto; display: flex; gap: 4px; }
+.dot { display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 4px; font: 700 11px var(--sans); }
+.d-simplify { color: var(--simp); background: var(--simp-bg); } .d-remove { color: var(--rem); background: var(--rem-bg); } .d-fix { color: var(--fix); background: var(--fix-bg); }
+.legend { margin: 22px 6px 0; font-size: 12px; color: var(--ink-3); display: grid; gap: 4px; }
+main { padding: 28px 36px 80px; max-width: 1400px; }
+.head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.head h2 { font: 600 20px var(--mono); margin: 0; }
+.about { color: var(--ink-2); max-width: 75ch; margin: 6px 0 18px; }
+.repo-sum { color: var(--ink-3); font-size: 13px; max-width: 90ch; margin: 0 0 20px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.bar { display: flex; gap: 8px; margin-bottom: 18px; align-items: center; }
+.chipbtn { border: 1px solid var(--line-2); background: var(--surface); color: var(--ink-2); padding: 4px 12px; border-radius: 999px; font: 500 12.5px var(--sans); cursor: pointer; }
+.chipbtn.on { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.theme { margin-left: auto; }
+.block { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 16px; overflow: hidden; }
+.bh { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+.bh .lines { font: 12px var(--mono); color: var(--ink-3); min-width: 74px; }
+.bh .t { font-weight: 600; }
+.verdict { margin-left: auto; font-size: 11.5px; font-weight: 600; letter-spacing: .02em; padding: 2px 10px; border-radius: 999px; white-space: nowrap; }
+.v-keep { color: var(--keep); background: var(--keep-bg); } .v-simplify { color: var(--simp); background: var(--simp-bg); }
+.v-remove { color: var(--rem); background: var(--rem-bg); } .v-fix { color: var(--fix); background: var(--fix-bg); }
+.bb { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(320px, 1fr); }
+.code { background: var(--sunk); border-right: 1px solid var(--line); overflow-x: auto; padding: 10px 0; font: 12.5px/1.6 var(--mono); }
+.ln { display: flex; white-space: pre; }
+.ln .no { width: 46px; flex: none; text-align: right; padding-right: 14px; color: var(--ink-3); user-select: none; }
+.ln .tx { padding-right: 16px; }
+.ln.mark { background: var(--code-hl); }
+.ln.mark .no { color: var(--ink); font-weight: 500; }
+.notes { padding: 14px 18px; display: grid; gap: 12px; align-content: start; }
+.label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 2px; }
+.notes p { margin: 0; color: var(--ink-2); }
+.lnotes { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.lnotes li { display: grid; grid-template-columns: 38px 1fr; gap: 6px; color: var(--ink-2); font-size: 13px; cursor: default; }
+.lnotes li b { font: 500 12px var(--mono); color: var(--ink-3); padding-top: 1px; }
+.lnotes li:hover b { color: var(--accent); }
+.judge { border-left: 3px solid var(--line-2); padding-left: 10px; }
+.judge.j-simplify { border-color: var(--simp); } .judge.j-fix { border-color: var(--fix); } .judge.j-remove { border-color: var(--rem); } .judge.j-keep { border-color: var(--keep); }
+.thread { display: grid; gap: 6px; }
+.msg { white-space: pre-wrap; font-size: 13px; padding: 7px 10px; border-radius: 8px; background: var(--sunk); border: 1px solid var(--line); }
+.msg.claude { background: var(--accent-soft); border-color: transparent; }
+.msg .who { font-size: 11px; font-weight: 600; color: var(--ink-3); margin-right: 6px; }
+.ask { display: flex; gap: 8px; }
+.ask textarea { flex: 1; min-height: 36px; resize: vertical; font: 13px var(--sans); color: var(--ink); background: var(--surface); border: 1px solid var(--line-2); border-radius: 8px; padding: 7px 10px; }
+.ask button { border: 0; background: var(--accent); color: #fff; font: 600 12.5px var(--sans); border-radius: 8px; padding: 0 14px; cursor: pointer; }
+.ask button:disabled { opacity: .5; cursor: default; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.empty { color: var(--ink-3); padding: 30px 0; }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav>
+    <h1>Code walkthrough</h1>
+    <div class="sub">Live code from your repos, my notes beside it.</div>
+    <div id="files"></div>
+    <div class="legend">
+      <span><span class="dot d-fix">!</span> Fix: a real problem</span>
+      <span><span class="dot d-simplify">~</span> Could be simpler</span>
+      <span><span class="dot d-remove">×</span> Not needed</span>
+    </div>
+  </nav>
+  <main id="main"></main>
+</div>
+<script>
+const S = { data: null, file: null, only: false };
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const VERDICT = { keep: "✓ Needed", simplify: "~ Could be simpler", remove: "× Not needed", fix: "! Fix" };
+const MARK = { simplify: "~", remove: "×", fix: "!" };
+const flagged = (b) => b.verdict !== "keep";
+
+async function load() {
+  S.data = await (await fetch("api/data")).json();
+  try { S.file = localStorage.getItem("wt-file"); } catch (e) {}
+  const all = S.data.repos.flatMap((r) => r.files);
+  if (!all.some((f) => f.path === S.file)) S.file = all[0].path;
+  renderNav(); renderMain();
+}
+
+function renderNav() {
+  document.getElementById("files").innerHTML = S.data.repos.map((r) =>
+    `<div class="repo">${esc(r.name)}</div>` + r.files.map((f) => {
+      const dots = f.blocks.filter(flagged).map((b) => `<span class="dot d-${b.verdict}">${MARK[b.verdict]}</span>`).join("");
+      return `<button class="file ${f.path === S.file ? "on" : ""}" data-path="${esc(f.path)}">${esc(f.path.split("/").pop())}<span class="n">${dots}</span></button>`;
+    }).join("")).join("");
+  document.querySelectorAll(".file").forEach((b) => b.onclick = () => {
+    S.file = b.dataset.path; try { localStorage.setItem("wt-file", S.file); } catch (e) {}
+    renderNav(); renderMain(); window.scrollTo(0, 0);
+  });
+}
+
+function thread(id) {
+  return S.data.comments.filter((c) => c.block === id).map((c) =>
+    `<div class="msg ${c.who === "Claude" ? "claude" : ""}"><span class="who">${esc(c.who)} · ${esc(c.at)}</span>${esc(c.text)}</div>`).join("");
+}
+
+function renderMain() {
+  const repo = S.data.repos.find((r) => r.files.some((f) => f.path === S.file));
+  const f = repo.files.find((x) => x.path === S.file);
+  const blocks = f.blocks.filter((b) => !S.only || flagged(b));
+  document.getElementById("main").innerHTML = `
+    <p class="repo-sum"><b>${esc(repo.name)}</b> · ${esc(repo.summary)}</p>
+    <div class="head"><h2>${esc(f.path.split("/").pop())}</h2><span style="color:var(--ink-3);font-size:12px">${esc(f.path)} · ${f.source.length} lines</span></div>
+    <p class="about">${esc(f.about)}</p>
+    <div class="bar">
+      <button class="chipbtn ${S.only ? "" : "on"}" data-only="0">All blocks (${f.blocks.length})</button>
+      <button class="chipbtn ${S.only ? "on" : ""}" data-only="1">Flagged (${f.blocks.filter(flagged).length})</button>
+      <button class="chipbtn theme" id="theme">Light / dark</button>
+    </div>
+    ${blocks.length ? blocks.map((b) => block(f, b)).join("") : '<div class="empty">Nothing flagged in this file.</div>'}`;
+  document.querySelectorAll("[data-only]").forEach((b) => b.onclick = () => { S.only = b.dataset.only === "1"; renderMain(); });
+  document.getElementById("theme").onclick = () => {
+    const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+    const cur = document.documentElement.dataset.theme || (dark ? "dark" : "light");
+    document.documentElement.dataset.theme = cur === "dark" ? "light" : "dark";
+  };
+  document.querySelectorAll(".ask").forEach((form) => {
+    const ta = form.querySelector("textarea"), btn = form.querySelector("button");
+    const send = async () => {
+      if (!ta.value.trim()) return;
+      btn.disabled = true;
+      await fetch("api/comment", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ block: form.dataset.block, text: ta.value }) });
+      ta.value = ""; btn.disabled = false; await refresh();
+    };
+    btn.onclick = send;
+    ta.onkeydown = (e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) send(); };
+  });
+}
+
+function block(f, b) {
+  const marks = new Set((b.lines || []).map((l) => l[0]));
+  const code = f.source.slice(b.start - 1, b.end).map((t, i) => {
+    const n = b.start + i;
+    return `<div class="ln ${marks.has(n) ? "mark" : ""}" id="${b.id}-L${n}"><span class="no">${n}</span><span class="tx">${esc(t) || " "}</span></div>`;
+  }).join("");
+  const lines = (b.lines || []).map((l) => `<li data-ln="${b.id}-L${l[0]}"><b>${l[0]}</b><span>${esc(l[1])}</span></li>`).join("");
+  return `<section class="block" id="${b.id}">
+    <div class="bh"><span class="lines">lines ${b.start}–${b.end}</span><span class="t">${esc(b.title)}</span><span class="verdict v-${b.verdict}">${VERDICT[b.verdict]}</span></div>
+    <div class="bb">
+      <div class="code">${code}</div>
+      <div class="notes">
+        <div><div class="label">What it does</div><p>${esc(b.what)}</p></div>
+        ${lines ? `<div><div class="label">Line by line</div><ul class="lnotes">${lines}</ul></div>` : ""}
+        <div class="judge j-${b.verdict}"><div class="label">My judgement</div><p>${esc(b.why)}</p></div>
+        <div class="thread" id="th-${b.id}">${thread(b.id)}</div>
+        <div class="ask" data-block="${b.id}"><textarea placeholder="Ask or decide something about this block…  (⌘↵ to send)"></textarea><button>Send</button></div>
+      </div>
+    </div></section>`;
+}
+
+async function refresh() {
+  const fresh = await (await fetch("api/data")).json();
+  S.data.comments = fresh.comments;
+  document.querySelectorAll(".thread").forEach((el) => { el.innerHTML = thread(el.id.slice(3)); });
+}
+
+setInterval(refresh, 4000);
+load();
+</script>
+</body>
+</html>

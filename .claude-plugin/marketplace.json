@@ -1,0 +1,16 @@
+{
+  "name": "code-walkthrough",
+  "owner": {
+    "name": "Prerak Garg"
+  },
+  "metadata": {
+    "description": "A Claude Code plugin for line-by-line code walkthroughs."
+  },
+  "plugins": [
+    {
+      "name": "code-walkthrough",
+      "source": "./",
+      "description": "Walk through a codebase block by block in a local page, with plain explanations and a comment box Claude answers."
+    }
+  ]
+}
